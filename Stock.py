@@ -16,6 +16,7 @@ yes/no: ")
     else:
         print("Invalid input.")
         continue_script()
+    input("Press Enter to continue...")
     return tmp
 
 
@@ -97,7 +98,13 @@ Input: ")
         print("====================")
         print("This feature is still being developed! Hold tight")
         print("====================")
+        input("Press Enter to continue...")
     elif('stop' == to_do):
         running = False
         print("====================")
         print("Goodbye :-)")
+    else:
+        print("====================")
+        print("Unkwown input, please try again")
+        print("====================")
+        input("Press Enter to continue...")
