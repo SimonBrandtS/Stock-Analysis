@@ -2,9 +2,9 @@ import math
 import pandas as pd
 from matplotlib import pyplot as plt
 
-m = float(input("Input start kapital: "))
-y = int(input("Input hele år på kontoen: "))
-o = float( input("Input opsarringsrente: "))
+m = float(input("Input starting capital on account: "))
+y = int(input("Input expected years on account: "))
+o = float( input("Input projected growth rate: "))
 
 df = pd.DataFrame({"År":[],"Aktiespare":[], "Aktiespare_skat":[],"Anden_skat":[]})
 
@@ -57,7 +57,7 @@ y,df = compund_interest_tax_2(m,y,o,df)
 z = df["År"]
 p = df["Aktiespare_skat"]
 h = df["Anden_skat"]
-plt.plot(z,p,'b-',label = 'Aktiesparekonto betalt skat')
-plt.plot(z,h,'r-',label = 'Andet depot skat')
+plt.plot(z,p,'b-',label = 'Aktiesparekonto paid tax')
+plt.plot(z,h,'r-',label = 'Other depot tax')
 plt.legend(loc = 'best')
 plt.show()
