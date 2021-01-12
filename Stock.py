@@ -1,7 +1,9 @@
 import math
 import pandas as pd
 from matplotlib import pyplot as plt
-
+import yfinance as yf
+import datetime
+import pandas_market_calendars as mcal
 running = True
 
 
@@ -19,6 +21,63 @@ yes/no: ")
     input("Press Enter to continue...")
     return tmp
 
+
+def is_gap_year(year):
+    x = 0
+    if(year > 2020):
+        x = year % 2020
+    else:
+        x = 2020 % year
+    if(x == 4):
+        return True
+    else:
+        return False
+
+def Average(lst): 
+    return sum(lst) / len(lst) 
+
+def calculate_average_growth(hist):
+    total_date = datetime.datetime.today()
+    yearly_avg = []
+    cal = mcal.get_calendar('NYSE')
+
+    first_day = hist.iloc[0].name
+    first_close = hist.iloc[0].Close
+    first_wekday = first_day.weekday()
+
+    year = first_day.year
+    day = first_day.day
+    month = first_day.month
+
+    next_year = year + 1
+    schecdule = cal.schedule(
+        start_date=f'{year}-{month}-{day}', end_date=f'{next_year}-{month}-{day}')
+    last_day = schecdule.iloc[-1]
+
+    final_day = last_day[1].day
+    final_year = last_day[1].year
+    final_month = last_day[1].month
+
+    for i, row in hist.iterrows():
+        if(i.year == final_year and i.day == final_day and i.month == final_month):
+            year = final_year
+            day = final_day
+            month = final_month
+            next_year = year + 1
+            schecdule = cal.schedule(
+                start_date=f'{year}-{month}-{day}', end_date=f'{next_year}-{month}-{day}')
+            iter_close = row.Close
+            diff = (iter_close-first_close)/first_close*100
+            yearly_avg.append(diff)
+            last_day = schecdule.iloc[-1]
+
+            final_day = last_day[1].day
+            final_year = last_day[1].year
+            final_month = last_day[1].month
+
+            first_close = iter_close
+            
+    return(Average(yearly_avg))
 
 def compund_interest_tax(money, year, increment, df):
     return_on_investment = money
@@ -43,11 +102,9 @@ def compund_interest_tax_2(money, year, increment, df):
             (return_on_investment / 100 * increment)
         if(return_on_investment-money <= 50000):
             tmp = return_on_investment / 100 * 27
-        #           tmp = return_on_investment - tmp
             df["Anden_skat"].iloc[i] = tmp
         else:
             tmp = return_on_investment / 100 * 42
-        #          tmp = return_on_investment - tmp
             df["Anden_skat"].iloc[i] = tmp
     if(return_on_investment-money <= 50000):
         return_on_investment = return_on_investment - \
@@ -92,13 +149,16 @@ Input: ")
             print("====================")
             print("Goodbye :-)")
             running = to_do_two
-        
 
     elif('auto' == to_do):
-        print("====================")
-        print("This feature is still being developed! Hold tight")
-        print("====================")
-        input("Press Enter to continue...")
+        tcr = input("Please enter Ticker: ")
+        stock = yf.Ticker(tcr)
+        period = input(
+            "Please input historical period as number + period type e.g. '5d' for 5 days (default is 5 years i.e. 5y): ")
+        if('' == period):
+            hist = stock.history(period="5y")
+            growth = calculate_average_growth(hist)
+
     elif('stop' == to_do):
         running = False
         print("====================")
