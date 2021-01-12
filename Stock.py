@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import yfinance as yf
 import datetime
 import pandas_market_calendars as mcal
+import re
 running = True
 
 
@@ -33,8 +34,10 @@ def is_gap_year(year):
     else:
         return False
 
-def Average(lst): 
-    return sum(lst) / len(lst) 
+
+def Average(lst):
+    return sum(lst) / len(lst)
+
 
 def calculate_average_growth(hist):
     total_date = datetime.datetime.today()
@@ -76,8 +79,9 @@ def calculate_average_growth(hist):
             final_month = last_day[1].month
 
             first_close = iter_close
-            
+
     return(Average(yearly_avg))
+
 
 def compund_interest_tax(money, year, increment, df):
     return_on_investment = money
@@ -116,55 +120,98 @@ def compund_interest_tax_2(money, year, increment, df):
     return return_on_investment, df
 
 
-while running:
-    to_do = input("What do you wish to do?\n\
+
+def plotTax(df):
+    z = df["År"]
+    p = df["Aktiespare_skat"]
+    h = df["Anden_skat"]
+    plt.plot(z, p, 'b-', label='Aktiesparekonto paid tax')
+    plt.plot(z, h, 'r-', label='Other depot tax')
+    plt.legend(loc='best')
+    plt.show()
+
+
+
+def main(running):
+    while running:
+        to_do = input("What do you wish to do?\n\
 Calculate tax based on manual input: 'man'\n\
 For projected tax based on stock: 'auto'    \n\
 To end program: 'stop'\n\
 Input: ")
 
-    if('man' == to_do):
-        print("====================")
-        m = float(input("Input starting capital on account: "))
-        y = int(input("Input expected years on account: "))
-        o = float(input("Input projected growth rate: "))
+        if('man' == to_do):
+            print("====================")
+            m = float(input("Input starting capital on account: "))
+            y = int(input("Input expected years on account: "))
+            o = float(input("Input projected growth rate: "))
 
-        df = pd.DataFrame({"År": [], "Aktiespare": [],
-                           "Aktiespare_skat": [], "Anden_skat": []})
+            df = pd.DataFrame({"År": [], "Aktiespare": [],
+                            "Aktiespare_skat": [], "Anden_skat": []})
 
-        x, df = compund_interest_tax(m, y, o, df)
+            x, df = compund_interest_tax(m, y, o, df)
 
-        y, df = compund_interest_tax_2(m, y, o, df)
+            y, df = compund_interest_tax_2(m, y, o, df)
 
-        z = df["År"]
-        p = df["Aktiespare_skat"]
-        h = df["Anden_skat"]
-        plt.plot(z, p, 'b-', label='Aktiesparekonto paid tax')
-        plt.plot(z, h, 'r-', label='Other depot tax')
-        plt.legend(loc='best')
-        plt.show()
-        print("====================")
-        to_do_two = continue_script()
-        if(False == to_do_two):
+            plotTax(df)
+
+            print("====================")
+            to_do_two = continue_script()
+            if(False == to_do_two):
+                print("====================")
+                print("Goodbye :-)")
+                running = to_do_two
+
+        elif('auto' == to_do):
+            tcr = input("Please enter Ticker: ")
+            stock = yf.Ticker(tcr)
+            period = input(
+                "Please input historical period as number + period type e.g. '3y' for 3 days (default is 5 years i.e. 5y): ")
+            test_string = re.findall('^[0-9][y]$',period)
+            if('' == period):
+                hist = stock.history(period="5y")
+                o = calculate_average_growth(hist)
+            elif(len(test_string)!=0):
+                print("todo: develop")
+                hist = stock.history(period = period)
+                o = calculate_average_growth(hist)
+            else:
+                print("====================")
+                print("Sorry, for now the input must be in years (i.e. '5y'")
+                to_do_two = continue_script()
+                if(False == to_do_two):
+                    print("====================")
+                    print("Goodbye :-)")
+                    running = to_do_two
+                    break
+                else:
+                    main(running)
+
+            m = float(input("Input starting capital on account: "))
+            y = int(input("Input expected years on account: "))
+
+            df = pd.DataFrame({"År": [], "Aktiespare": [],
+                            "Aktiespare_skat": [], "Anden_skat": []})
+
+            x, df = compund_interest_tax(m, y, o, df)
+
+            y, df = compund_interest_tax_2(m, y, o, df)
+            
+
+            plotTax(df)
+            print("====================")
+            to_do_two = continue_script()
+            if(False == to_do_two):
+                    print("====================")
+                    print("Goodbye :-)")
+                    running = to_do_two
+        elif('stop' == to_do):
+            running = False
             print("====================")
             print("Goodbye :-)")
-            running = to_do_two
-
-    elif('auto' == to_do):
-        tcr = input("Please enter Ticker: ")
-        stock = yf.Ticker(tcr)
-        period = input(
-            "Please input historical period as number + period type e.g. '5d' for 5 days (default is 5 years i.e. 5y): ")
-        if('' == period):
-            hist = stock.history(period="5y")
-            growth = calculate_average_growth(hist)
-
-    elif('stop' == to_do):
-        running = False
-        print("====================")
-        print("Goodbye :-)")
-    else:
-        print("====================")
-        print("Unkwown input, please try again")
-        print("====================")
-        input("Press Enter to continue...")
+        else:
+            print("====================")
+            print("Unkwown input, please try again")
+            print("====================")
+            input("Press Enter to continue...")
+main(running)
