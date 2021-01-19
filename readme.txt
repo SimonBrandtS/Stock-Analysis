@@ -1,0 +1,1 @@
+NOTE: Taxes calculated are only for Denmark
