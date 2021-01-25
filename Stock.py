@@ -79,7 +79,7 @@ def calculate_average_growth(hist):
             final_month = last_day[1].month
 
             first_close = iter_close
-
+    
     return(Average(yearly_avg))
 
 
@@ -188,24 +188,37 @@ Input: ")
                 else:
                     main(running)
 
-            m = float(input("Input starting capital on account: "))
-            y = int(input("Input expected years on account: "))
+            to_do_three = input("What do you wish to find out?\n\
+Average yearly growth:  growth\n\
+Plot tax:               tax\n\
+Input: ")
+            if("growth"==to_do_three):
+                m = float(input("Input starting capital on account: "))
+                y = int(input("Input expected years on account: "))
 
-            df = pd.DataFrame({"År": [], "Aktiespare": [],
-                            "Aktiespare_skat": [], "Anden_skat": []})
+                df = pd.DataFrame({"År": [], "Aktiespare": [],
+                                "Aktiespare_skat": [], "Anden_skat": []})
 
-            x, df = compund_interest_tax(m, y, o, df)
+                x, df = compund_interest_tax(m, y, o, df)
 
-            y, df = compund_interest_tax_2(m, y, o, df)
-            
+                y, df = compund_interest_tax_2(m, y, o, df)
+                
 
-            plotTax(df)
-            print("====================")
-            to_do_two = continue_script()
-            if(False == to_do_two):
-                    print("====================")
-                    print("Goodbye :-)")
-                    running = to_do_two
+                plotTax(df)
+                print("====================")
+                to_do_two = continue_script()
+                if(False == to_do_two):
+                        print("====================")
+                        print("Goodbye :-)")
+                        running = to_do_two
+            elif("tax"==to_do_three):
+                print(f"The average yearly growth for {tcr} is {o}%")
+                print("====================")
+                to_do_two = continue_script()
+                if(False == to_do_two):
+                        print("====================")
+                        print("Goodbye :-)")
+                        running = to_do_two
         elif('stop' == to_do):
             running = False
             print("====================")
