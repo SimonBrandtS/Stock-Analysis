@@ -133,6 +133,7 @@ def plotTax(df):
 
 
 def main(running):
+    running = running
     while running:
         to_do = input("What do you wish to do?\n\
 Calculate tax based on manual input: 'man'\n\
