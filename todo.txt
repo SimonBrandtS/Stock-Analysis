@@ -1,3 +1,4 @@
 1) Make 'auto' work with smaller increments than years.
 2) Make 'auto' work with newer stocks such as Palantir
-3) Add more functionality (such as machine learning predicting dividends)
+3) Fix bug with calling stop
+4) Add more functionality (such as machine learning predicting dividends)
